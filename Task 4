@@ -1,0 +1,59 @@
+import tweepy
+from textblob import TextBlob
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Twitter API credentials
+consumer_key = 'YOUR_CONSUMER_KEY'
+consumer_secret = 'YOUR_CONSUMER_SECRET'
+access_token = 'YOUR_ACCESS_TOKEN'
+access_token_secret = 'YOUR_ACCESS_TOKEN_SECRET'
+
+# Authenticate with the Twitter API
+auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
+api = tweepy.API(auth)
+
+# Function to fetch tweets related to a specific topic or brand
+def fetch_tweets(query, count=100):
+    tweets = []
+    try:
+        fetched_tweets = api.search_tweets(q=query, count=count, lang='en')
+        for tweet in fetched_tweets:
+            tweets.append(tweet.text)
+    except tweepy.TweepError as e:
+        print("Error : " + str(e))
+    return tweets
+
+# Function to perform sentiment analysis using TextBlob
+def analyze_sentiment(tweets):
+    sentiments = []
+    for tweet in tweets:
+        analysis = TextBlob(tweet)
+        if analysis.sentiment.polarity > 0:
+            sentiments.append('Positive')
+        elif analysis.sentiment.polarity == 0:
+            sentiments.append('Neutral')
+        else:
+            sentiments.append('Negative')
+    return sentiments
+
+# Fetch and analyze tweets related to "Apple"
+tweets = fetch_tweets("Apple", count=200)
+sentiments = analyze_sentiment(tweets)
+
+# Create a DataFrame to store tweets and their sentiment
+df = pd.DataFrame({'Tweet': tweets, 'Sentiment': sentiments})
+
+# Plot the sentiment distribution
+plt.figure(figsize=(8, 6))
+sns.countplot(x='Sentiment', data=df, palette='viridis')
+plt.title('Sentiment Analysis of Tweets about Apple')
+plt.xlabel('Sentiment')
+plt.ylabel('Number of Tweets')
+plt.show()
+
+# Display some example tweets from each sentiment category
+for sentiment in ['Positive', 'Neutral', 'Negative']:
+    print(f"\nExample {sentiment} Tweets:")
+    print(df[df['Sentiment'] == sentiment]['Tweet'].sample(3).values)
