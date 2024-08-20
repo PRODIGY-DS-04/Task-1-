@@ -1,0 +1,28 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import numpy as np
+
+# Example data
+data = {
+    'Gender': ['Male', 'Female', 'Female', 'Male', 'Female', 'Male', 'Female', 'Male', 'Female', 'Male'],
+    'Age': [23, 45, 56, 34, 29, 40, 51, 38, 46, 50]
+}
+
+df = pd.DataFrame(data)
+
+# Bar chart for the distribution of the categorical variable (Gender)
+plt.figure(figsize=(10, 5))
+sns.countplot(x='Gender', data=df, palette='viridis')
+plt.title('Gender Distribution')
+plt.xlabel('Gender')
+plt.ylabel('Count')
+plt.show()
+
+# Histogram for the distribution of the continuous variable (Age)
+plt.figure(figsize=(10, 5))
+sns.histplot(df['Age'], bins=5, kde=True, color='blue')
+plt.title('Age Distribution')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.show()
