@@ -1,0 +1,82 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Step 1: Load the Dataset and Basic Cleaning
+
+# Load the Titanic dataset
+url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+df = pd.read_csv(url)
+
+# Display the first few rows of the dataset
+print("First 5 rows of the dataset:")
+print(df.head())
+
+# Check for missing values
+print("\nMissing values in each column:")
+print(df.isnull().sum())
+
+# Drop columns that are not useful for analysis
+df.drop(['PassengerId', 'Name', 'Ticket', 'Cabin'], axis=1, inplace=True)
+
+# Fill missing values
+df['Age'].fillna(df['Age'].median(), inplace=True)
+df['Embarked'].fillna(df['Embarked'].mode()[0], inplace=True)
+
+# Convert categorical variables to numeric
+df['Sex'] = df['Sex'].map({'male': 0, 'female': 1})
+df['Embarked'] = df['Embarked'].map({'S': 0, 'C': 1, 'Q': 2})
+
+# Verify the cleaned data
+print("\nData info after cleaning:")
+print(df.info())
+print("\nSummary statistics:")
+print(df.describe())
+
+# Step 2: Exploratory Data Analysis (EDA)
+
+# 1. Survival Rate by Gender
+plt.figure(figsize=(8, 6))
+sns.barplot(x='Sex', y='Survived', data=df, palette='coolwarm')
+plt.title('Survival Rate by Gender')
+plt.xlabel('Gender (0 = Male, 1 = Female)')
+plt.ylabel('Survival Rate')
+plt.show()
+
+# 2. Survival Rate by Class
+plt.figure(figsize=(8, 6))
+sns.barplot(x='Pclass', y='Survived', data=df, palette='coolwarm')
+plt.title('Survival Rate by Class')
+plt.xlabel('Passenger Class')
+plt.ylabel('Survival Rate')
+plt.show()
+
+# 3. Age Distribution of Survivors vs Non-Survivors
+plt.figure(figsize=(10, 6))
+sns.histplot(df[df['Survived'] == 1]['Age'], bins=30, kde=False, color='green', label='Survived')
+sns.histplot(df[df['Survived'] == 0]['Age'], bins=30, kde=False, color='red', label='Not Survived')
+plt.title('Age Distribution of Survivors vs Non-Survivors')
+plt.xlabel('Age')
+plt.ylabel('Frequency')
+plt.legend()
+plt.show()
+
+# 4. Survival Rate by Embarked Location
+plt.figure(figsize=(8, 6))
+sns.barplot(x='Embarked', y='Survived', data=df, palette='coolwarm')
+plt.title('Survival Rate by Embarkation Location')
+plt.xlabel('Embarkation Location (0 = S, 1 = C, 2 = Q)')
+plt.ylabel('Survival Rate')
+plt.show()
+
+# 5. Pairplot of Key Features
+sns.pairplot(df[['Survived', 'Pclass', 'Sex', 'Age', 'Fare']], hue='Survived', palette='coolwarm')
+plt.show()
+
+# Step 3: Summary of Findings
+print("Summary of EDA:")
+print("1. Females had a higher survival rate compared to males.")
+print("2. Passengers in higher classes (1st class) had a higher survival rate.")
+print("3. Younger passengers had a higher chance of survival.")
+print("4. Passengers who embarked from 'C' had a slightly higher survival rate.")
