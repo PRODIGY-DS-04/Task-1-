@@ -1,0 +1,67 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+from sklearn import tree
+
+# Load the Bank Marketing dataset
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00222/bank-additional-full.csv"
+df = pd.read_csv(url, sep=';')
+
+# Display the first few rows of the dataset
+print("First 5 rows of the dataset:")
+print(df.head())
+
+# Check for missing values
+print("\nMissing values in each column:")
+print(df.isnull().sum())
+
+# Step 2: Data Preprocessing
+
+# Convert categorical variables to numeric using LabelEncoder
+le = LabelEncoder()
+
+for column in df.columns:
+    if df[column].dtype == 'object':
+        df[column] = le.fit_transform(df[column])
+
+# Display the first few rows of the encoded dataset
+print("\nFirst 5 rows of the encoded dataset:")
+print(df.head())
+
+# Step 3: Split the Data into Training and Testing Sets
+
+X = df.drop('y', axis=1)  # Features
+y = df['y']               # Target variable
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Step 4: Build and Train the Decision Tree Classifier
+
+clf = DecisionTreeClassifier(random_state=42)
+clf.fit(X_train, y_train)
+
+# Step 5: Make Predictions and Evaluate the Model
+
+y_pred = clf.predict(X_test)
+
+# Accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+# Classification Report
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+# Confusion Matrix
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+# Step 6: Visualize the Decision Tree
+
+plt.figure(figsize=(20, 10))
+tree.plot_tree(clf, feature_names=X.columns, class_names=['No', 'Yes'], filled=True)
+plt.title("Decision Tree for Predicting Purchase")
+plt.show()
